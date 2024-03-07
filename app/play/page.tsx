@@ -1,7 +1,4 @@
-import { Hanken_Grotesk } from "next/font/google";
 import { GameGrid } from "./_components/game-grid";
-
-const font = Hanken_Grotesk({ subsets: ["latin"] });
 
 const WORD = "alien";
 
@@ -9,10 +6,7 @@ export default function Home() {
   return (
     <>
       <header className="h-16 border-b border-neutral-800 flex items-center">
-        <h1
-          className="text-3xl font-bold tracking-wide text-center mx-auto text-white"
-          style={font.style}
-        >
+        <h1 className="text-3xl font-bold tracking-wide text-center mx-auto text-white">
           Wordle
         </h1>
       </header>
