@@ -1,7 +1,5 @@
 import { GameGrid } from "./_components/game-grid";
 
-const WORD = "alien";
-
 export default function Home() {
   return (
     <>
@@ -11,7 +9,7 @@ export default function Home() {
         </h1>
       </header>
       <main className="p-4 flex items-center justify-center mt-20">
-        <GameGrid cols={5} rows={6} correctWord={WORD} />
+        <GameGrid />
       </main>
     </>
   );

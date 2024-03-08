@@ -1,23 +1,17 @@
 "use client";
 
-import { computeState, isWordValid } from "@/lib/utils";
+import { COLS, ROWS, WORD } from "@/lib/constants";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useEventListener } from "usehooks-ts";
-import { LetterBox } from "./letter-box";
+import { GameRow } from "./game-row";
 
-type GameGridProps = {
-  rows: number;
-  cols: number;
-  correctWord: string;
-};
+export function GameGrid() {
+  const rows = Array(ROWS).fill(0);
+  const cols = Array(COLS).fill(0);
 
-export function GameGrid({ rows, cols, correctWord }: GameGridProps) {
-  const ROWS = Array(rows).fill(0);
-  const COLS = Array(cols).fill(0);
-
-  const [guess, setGuess] = useState("");
-  const [state, setState] = useState<("correct" | "present" | "absent")[]>();
+  const [activeRow, setActiveRow] = useState(0);
+  const [guesses, setGuesses] = useState<string[]>(["", "", "", "", "", ""]);
 
   useEventListener("keydown", async (e) => {
     if (e.metaKey || e.shiftKey || e.ctrlKey || e.altKey) {
@@ -25,43 +19,57 @@ export function GameGrid({ rows, cols, correctWord }: GameGridProps) {
     }
 
     if (e.code === "Backspace") {
-      setGuess((guess) => guess.slice(0, -1));
+      setGuesses((guesses) => {
+        const copy = [...guesses];
+        copy[activeRow] = copy[activeRow]!.slice(0, -1);
+        return copy;
+      });
       return;
     }
 
-    if (e.code === "Enter" && guess.length === 5) {
-      const valid = await isWordValid(guess);
-      if (valid) {
-        setState(computeState(correctWord, guess));
+    if (e.code === "Enter" && guesses[activeRow]?.length === 5) {
+      if (guesses[activeRow] === WORD) {
+        toast.success("Correct!");
       } else {
-        toast.error("Not in word list");
+        toast.error("Incorrect!");
       }
+      setActiveRow((activeRow) => activeRow + 1);
+      return;
     }
 
     if (!e.code.startsWith("Key")) {
       return;
     }
 
-    if (guess.length === 5) {
+    if (guesses[activeRow]?.length === 5) {
       return;
     }
 
-    setGuess((guess) => guess + e.key);
+    setGuesses((guesses) => {
+      const copy = [...guesses];
+      copy[activeRow] = copy[activeRow] + e.key;
+      return copy;
+    });
   });
+
+  if (activeRow >= ROWS) {
+    return (
+      <div className="text-center">
+        <h1 className="text-3xl font-bold">Game Over</h1>
+        <h2 className="text-2xl font-bold">The word was {WORD}</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
-      {ROWS.map((_, i) => (
-        <div key={i} className="flex gap-2">
-          {COLS.map((_, j) => (
-            <LetterBox
-              key={`${i}${j}`}
-              index={j}
-              letter={guess[i * ROWS.length + j]}
-              state={state?.[i * ROWS.length + j]}
-            />
-          ))}
-        </div>
+      {rows.map((_, i) => (
+        <GameRow
+          key={i}
+          guess={guesses[i] ?? ""}
+          active={i === activeRow}
+          guessOver={i < activeRow}
+        />
       ))}
     </div>
   );
