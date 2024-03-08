@@ -8,12 +8,7 @@ type GameRowProps = {
   onGuess?: (guess: string) => void;
 };
 
-export function GameRow({
-  guess,
-  active = false,
-  guessOver = false,
-  onGuess,
-}: GameRowProps) {
+export function GameRow({ guess, active = false, guessOver = false, onGuess }: GameRowProps) {
   const cols = Array(COLS).fill(0);
 
   return (
@@ -22,8 +17,8 @@ export function GameRow({
         <div
           key={i}
           className={cn(
-            "w-16 h-16 border-2 text-white text-3xl flex items-center font-bold justify-center uppercase border-neutral-700 transition duration-1000",
-            guessOver && "bg-neutral-700"
+            "flex h-16 w-16 items-center justify-center border-2 border-neutral-700 text-3xl font-bold uppercase text-white transition duration-1000",
+            guessOver && "bg-neutral-700",
             //  {
             //    "border-transparent bg-green-500/50": state === "correct",
             //    "border-transparent bg-yellow-500/80": state === "present",

@@ -11,7 +11,7 @@ export function GameGrid() {
 
   const guesses = useGuesses();
   const activeGuess = useActiveGuess();
-  const activeRow = useActiveRow()
+  const activeRow = useActiveRow();
   const { addLetter, removeLetter, moveToNextRow } = useGameActions();
 
   useEventListener("keydown", async (e) => {
