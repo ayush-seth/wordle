@@ -1,6 +1,6 @@
 "use client";
 
-import { isWordValid } from "@/lib/utils";
+import { computeState, isWordValid } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useEventListener } from "usehooks-ts";
@@ -65,19 +65,4 @@ export function GameGrid({ rows, cols, correctWord }: GameGridProps) {
       ))}
     </div>
   );
-}
-
-function computeState(correctWord: string, guess: string) {
-  const state: ("correct" | "present" | "absent")[] = [];
-  for (let i = 0; i < guess.length; i++) {
-    if (correctWord[i] === guess[i]) {
-      state.push("correct");
-    } else if (correctWord.includes(guess[i]!)) {
-      state.push("present");
-    } else {
-      state.push("absent");
-    }
-  }
-
-  return state;
 }
