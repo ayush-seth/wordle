@@ -1,17 +1,18 @@
 "use client";
 
-import { COLS, ROWS, WORD } from "@/lib/constants";
-import { useState } from "react";
+import { ROWS, WORD } from "@/lib/constants";
+import { useActiveGuess, useActiveRow, useGameActions, useGuesses } from "@/lib/game-store";
 import { toast } from "sonner";
 import { useEventListener } from "usehooks-ts";
 import { GameRow } from "./game-row";
 
 export function GameGrid() {
   const rows = Array(ROWS).fill(0);
-  const cols = Array(COLS).fill(0);
 
-  const [activeRow, setActiveRow] = useState(0);
-  const [guesses, setGuesses] = useState<string[]>(["", "", "", "", "", ""]);
+  const guesses = useGuesses();
+  const activeGuess = useActiveGuess();
+  const activeRow = useActiveRow()
+  const { addLetter, removeLetter, moveToNextRow } = useGameActions();
 
   useEventListener("keydown", async (e) => {
     if (e.metaKey || e.shiftKey || e.ctrlKey || e.altKey) {
@@ -19,21 +20,16 @@ export function GameGrid() {
     }
 
     if (e.code === "Backspace") {
-      setGuesses((guesses) => {
-        const copy = [...guesses];
-        copy[activeRow] = copy[activeRow]!.slice(0, -1);
-        return copy;
-      });
-      return;
+      removeLetter();
     }
 
-    if (e.code === "Enter" && guesses[activeRow]?.length === 5) {
-      if (guesses[activeRow] === WORD) {
+    if (e.code === "Enter" && activeGuess.length === 5) {
+      if (activeGuess === WORD) {
         toast.success("Correct!");
       } else {
         toast.error("Incorrect!");
+        moveToNextRow();
       }
-      setActiveRow((activeRow) => activeRow + 1);
       return;
     }
 
@@ -41,15 +37,11 @@ export function GameGrid() {
       return;
     }
 
-    if (guesses[activeRow]?.length === 5) {
+    if (activeGuess.length === 5) {
       return;
     }
 
-    setGuesses((guesses) => {
-      const copy = [...guesses];
-      copy[activeRow] = copy[activeRow] + e.key;
-      return copy;
-    });
+    addLetter(e.key);
   });
 
   if (activeRow >= ROWS) {
@@ -64,12 +56,7 @@ export function GameGrid() {
   return (
     <div className="space-y-2">
       {rows.map((_, i) => (
-        <GameRow
-          key={i}
-          guess={guesses[i] ?? ""}
-          active={i === activeRow}
-          guessOver={i < activeRow}
-        />
+        <GameRow key={i} guess={guesses[i]!} active={i === activeRow} guessOver={i < activeRow} />
       ))}
     </div>
   );
