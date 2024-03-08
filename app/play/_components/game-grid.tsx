@@ -6,16 +6,17 @@ import { toast } from "sonner";
 import { useEventListener } from "usehooks-ts";
 import { GameRow } from "./game-row";
 
-export function GameGrid() {
-  const rows = Array(ROWS).fill(0);
+const rows = Array(ROWS).fill(0);
 
+export function GameGrid() {
   const guesses = useGuesses();
   const activeGuess = useActiveGuess();
   const activeRow = useActiveRow();
   const { addLetter, removeLetter, moveToNextRow } = useGameActions();
 
   useEventListener("keydown", async (e) => {
-    if (e.metaKey || e.shiftKey || e.ctrlKey || e.altKey) {
+    const isModifierKey = e.metaKey || e.shiftKey || e.ctrlKey || e.altKey;
+    if (isModifierKey) {
       return;
     }
 
@@ -30,18 +31,16 @@ export function GameGrid() {
         toast.error("Incorrect!");
         moveToNextRow();
       }
-      return;
-    }
-
-    if (!e.code.startsWith("Key")) {
-      return;
     }
 
     if (activeGuess.length === 5) {
       return;
     }
 
-    addLetter(e.key);
+    const isLetter = e.key.match(/^[a-z]$/i);
+    if (isLetter) {
+      addLetter(e.key);
+    }
   });
 
   if (activeRow >= ROWS) {
