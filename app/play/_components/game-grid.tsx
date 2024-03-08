@@ -1,8 +1,7 @@
 "use client";
 
-import { ROWS, WORD } from "@/lib/constants";
-import { useActiveGuess, useActiveRow, useGameActions, useGuesses } from "@/lib/game-store";
-import { toast } from "sonner";
+import { ROWS } from "@/lib/constants";
+import { useActiveGuess, useActiveRow, useGameActions, useGuessStates, useGuesses } from "@/lib/game-store";
 import { useEventListener } from "usehooks-ts";
 import { GameRow } from "./game-row";
 
@@ -11,8 +10,9 @@ const rows = Array(ROWS).fill(0);
 export function GameGrid() {
   const guesses = useGuesses();
   const activeGuess = useActiveGuess();
+  const guessStates = useGuessStates();
   const activeRow = useActiveRow();
-  const { addLetter, removeLetter, moveToNextRow } = useGameActions();
+  const { addLetter, removeLetter, submitGuess } = useGameActions();
 
   useEventListener("keydown", async (e) => {
     const isModifierKey = e.metaKey || e.shiftKey || e.ctrlKey || e.altKey;
@@ -24,17 +24,8 @@ export function GameGrid() {
       removeLetter();
     }
 
-    if (e.code === "Enter" && activeGuess.length === 5) {
-      if (activeGuess === WORD) {
-        toast.success("Correct!");
-      } else {
-        toast.error("Incorrect!");
-        moveToNextRow();
-      }
-    }
-
-    if (activeGuess.length === 5) {
-      return;
+    if (e.code === "Enter") {
+      submitGuess();
     }
 
     const isLetter = e.key.match(/^[a-z]$/i);
@@ -43,19 +34,10 @@ export function GameGrid() {
     }
   });
 
-  if (activeRow >= ROWS) {
-    return (
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">Game Over</h1>
-        <h2 className="text-2xl font-bold">The word was {WORD}</h2>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-2">
       {rows.map((_, i) => (
-        <GameRow key={i} guess={guesses[i]!} active={i === activeRow} guessOver={i < activeRow} />
+        <GameRow key={i} guess={guesses[i]!} state={guessStates[i]!} />
       ))}
     </div>
   );
