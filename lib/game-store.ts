@@ -14,13 +14,16 @@ type GameStore = {
   };
 };
 
-const useGameStore = create<GameStore>((set) => ({
+const useGameStore = create<GameStore>((set, get) => ({
   guesses: { 0: "", 1: "", 2: "", 3: "", 4: "", 5: "" },
   guessStates: { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [] },
   gameState: "playing",
   activeRow: 0,
   actions: {
-    addLetter: (char: string) =>
+    addLetter: (char: string) => {
+      if (get().gameState === "won") {
+        return;
+      }
       set((state) => {
         const guess = state.guesses[state.activeRow]!;
         if (guess.length === 5) {
@@ -33,15 +36,20 @@ const useGameStore = create<GameStore>((set) => ({
             [state.activeRow]: guess + char,
           },
         };
-      }),
-    removeLetter: () =>
+      });
+    },
+    removeLetter: () => {
+      if (get().gameState === "won") {
+        return;
+      }
       set((state) => ({
         guesses: {
           ...state.guesses,
           [state.activeRow]: state.guesses[state.activeRow]!.slice(0, -1),
         },
-      })),
-    submitGuess: () =>
+      }));
+    },
+    submitGuess: () => {
       set((state) => {
         const guess = state.guesses[state.activeRow]!;
         if (guess.length !== 5) {
@@ -61,12 +69,15 @@ const useGameStore = create<GameStore>((set) => ({
         return {
           activeRow: state.activeRow + 1,
           guessStates: { ...state.guessStates, [state.activeRow]: computeState(WORD, guess) },
+          gameState: state.activeRow === 5 ? "lost" : "playing",
         };
-      }),
+      });
+    },
   },
 }));
 
 export const useGuesses = () => useGameStore((state) => state.guesses);
+export const useGameState = () => useGameStore((state) => state.gameState);
 export const useActiveGuess = () => useGameStore((state) => state.guesses[state.activeRow]!);
 export const useGuessStates = () => useGameStore((state) => state.guessStates);
 export const useActiveRow = () => useGameStore((state) => state.activeRow);

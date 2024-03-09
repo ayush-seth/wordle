@@ -40,22 +40,22 @@ const bottomRow = [
 
 export function Keyboard() {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-center gap-2">
+    <div className="flex w-full flex-col gap-1.5">
+      <div className="flex justify-center gap-1.5">
         {topRow.map((key) => (
           <KeyboardKey key={key.value} value={key.value}>
             {key.value}
           </KeyboardKey>
         ))}
       </div>
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-1.5">
         {middleRow.map((key) => (
           <KeyboardKey key={key.value} value={key.value}>
             {key.value}
           </KeyboardKey>
         ))}
       </div>
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-1.5">
         {bottomRow.map((key) => (
           <KeyboardKey key={key.value} value={key.value}>
             {key.icon ?? key.value}

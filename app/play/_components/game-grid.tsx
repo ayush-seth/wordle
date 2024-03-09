@@ -1,7 +1,7 @@
 "use client";
 
 import { ROWS } from "@/lib/constants";
-import { useGameActions, useGuessStates, useGuesses } from "@/lib/game-store";
+import { useGameActions, useGameState, useGuessStates, useGuesses } from "@/lib/game-store";
 import { useEventListener } from "usehooks-ts";
 import { GameRow } from "./game-row";
 
@@ -10,6 +10,7 @@ const rows = Array(ROWS).fill(0);
 export function GameGrid() {
   const guesses = useGuesses();
   const guessStates = useGuessStates();
+  const gameState = useGameState();
   const { addLetter, removeLetter, submitGuess } = useGameActions();
 
   useEventListener("keydown", async (e) => {
@@ -33,7 +34,7 @@ export function GameGrid() {
   });
 
   return (
-    <div className="space-y-2">
+    <div className="flex w-full flex-col items-center gap-2">
       {rows.map((_, i) => (
         <GameRow key={i} guess={guesses[i]!} state={guessStates[i]!} />
       ))}
